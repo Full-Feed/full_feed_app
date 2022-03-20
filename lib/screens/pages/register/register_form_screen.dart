@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:full_feed_app/presenters/register_presenter.dart';
 import 'package:full_feed_app/screens/widgets/authentication/dropdown.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/user_provider.dart';
 
 class Option{
-
   int id;
   String name;
 
@@ -17,9 +18,8 @@ class Option{
 }
 
 class RolRegisterFormScreen extends StatefulWidget {
-  RegisterPresenter presenter;
 
-  RolRegisterFormScreen({Key? key, required this.presenter}) : super(key: key);
+  RolRegisterFormScreen({Key? key}) : super(key: key);
 
   @override
   RolRegisterFormScreenState createState() => RolRegisterFormScreenState();
@@ -30,16 +30,10 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
 
   File? image;
   final constants = Constants();
-  final _formKey = GlobalKey<FormState>();
   bool isHiddenPassword = true;
   List<Option> sexList = [Option(1, "Femenino"), Option(2, "Masculino")];
   DateTime startDate = DateTime.now();
   TextEditingController birthDayController = TextEditingController();
-
-  void _togglePassword() {
-    isHiddenPassword = !isHiddenPassword;
-    setState(() {});
-  }
 
   Future<void> selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -62,11 +56,12 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
         locale: Locale('en'),
         context: context,
         initialDate: startDate,
-        firstDate: DateTime(DateTime.now().year),
+        firstDate: DateTime(1930),
         lastDate: DateTime(2025));
     if (picked != null && picked != startDate) {
       setState(() {
-        birthDayController.text = DateFormat('dd/MM/yyy').format(picked);
+        Provider.of<UserProvider>(context, listen: false).registerPresenter.birthDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(picked);
+        birthDayController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
@@ -84,10 +79,18 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
   }
 
   @override
-  bool get wantKeepAlive => true;
+  void initState() {
+    Provider.of<UserProvider>(context, listen: false).registerPresenter.rolFormKey = GlobalKey(debugLabel: 'ROL_REGISTER');
+    super.initState();
+  }
+
+  @override
+  bool get wantKeepAlive => false;
 
   @override
   void dispose() {
+    Provider.of<UserProvider>(context, listen: false).registerPresenter.rolFormKey.currentState!.dispose();
+    Provider.of<UserProvider>(context, listen: false).registerPresenter.userFormKey.currentState!.dispose();
     super.dispose();
   }
 
@@ -100,7 +103,7 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
     child: Column(
       children: [
         Form(
-          key: _formKey,
+          key: Provider.of<UserProvider>(context, listen: false).registerPresenter.rolFormKey,
           child: Flexible(
             child: ListView(
               children: [
@@ -144,7 +147,7 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                   ),
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
-                    child: TextFormField(
+                    child: TextField(
                       controller: birthDayController,
                       readOnly: true,
                       onTap: () => selectStartDate(context),
@@ -158,16 +161,10 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                               ),
                               borderRadius: BorderRadius.all(Radius.circular(30.0)))),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Seleccione su fecha de nacimiento";
-                        }
-                      },
                     ),
                   ),
                 ),
-                widget.presenter.desireRol == 1 ? Container(
+                Provider.of<UserProvider>(context, listen: false).registerPresenter.desireRol == 1 ? Container(
                   height: size.height/20,
                   decoration: BoxDecoration(
                       color: Color(0XFFFAFAFA),
@@ -186,7 +183,7 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                     child: TextFormField(
                         onChanged: (value){
                           setState(() {
-                            widget.presenter.height = double.parse(value);
+                            Provider.of<UserProvider>(context, listen: false).registerPresenter.height = double.parse(value);
                           });
                         },
                         decoration: const InputDecoration(
@@ -199,12 +196,11 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                               ),
                               borderRadius: BorderRadius.all(Radius.circular(30.0)))),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese su estatura";
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese su altura ";
+                          }
                         }
-                      },
                     ),
                   ),
                 ) : Container(
@@ -224,6 +220,11 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
+                      onChanged: (value){
+                        setState(() {
+                          Provider.of<UserProvider>(context, listen: false).registerPresenter.licenseNumber = value;
+                        });
+                      },
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(color: Colors.grey),
                           hintText: 'Código de nutricionista',
@@ -234,17 +235,16 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                               ),
                               borderRadius: BorderRadius.all(Radius.circular(30.0)))),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese código de nutricionista";
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese su codigo de nutricionista";
+                          }
                         }
-                      },
                     ),
                   ),
                 ),
                 Visibility(
-                  visible: widget.presenter.desireRol == 1 ? true : false,
+                  visible: Provider.of<UserProvider>(context, listen: false).registerPresenter.desireRol == 1 ? true : false,
                   child: Container(
                     height: size.height/20,
                     decoration: BoxDecoration(
@@ -264,7 +264,7 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                       child: TextFormField(
                         onChanged: (value){
                           setState(() {
-                            widget.presenter.weight = double.parse(value);
+                            Provider.of<UserProvider>(context, listen: false).registerPresenter.weight = double.parse(value);
                           });
                         },
                           decoration: const InputDecoration(

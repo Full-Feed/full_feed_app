@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/providers/diet_provider.dart';
 import 'package:full_feed_app/utilities/constants.dart';
+import 'package:provider/provider.dart';
 
-class Meal extends StatefulWidget {
-  final String mealType;
-  final String description;
-  const Meal({Key? key, required this.mealType, required this.description}) : super(key: key);
+import '../../../models/entities/meal.dart';
+
+class MealHome extends StatefulWidget {
+  final Meal meal;
+  const MealHome({Key? key, required this.meal}) : super(key: key);
 
   @override
-  _MealState createState() => _MealState();
+  MealHomeState createState() => MealHomeState();
 }
 
-class _MealState extends State<Meal> {
+class MealHomeState extends State<MealHome> {
   List<bool> isSelected = List.generate(1, (_) => false);
   final constants = Constants();
 
@@ -26,8 +29,8 @@ class _MealState extends State<Meal> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.mealType, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(widget.description)
+              Text(Provider.of<DietProvider>(context, listen: false).homePresenter.setFoodDayName(widget.meal.schedule.toString()), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              Text(widget.meal.name.toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12),)
             ],
           ),
           Positioned(

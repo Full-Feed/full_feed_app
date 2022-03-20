@@ -84,7 +84,7 @@ class _HomeDietCardState extends State<HomeDietCard> {
                 Stack(
                   alignment: Alignment.center,
                   children: [
-                    Icon(Icons.calendar_today, size: 35, color: Color(constants.calendarColor)),
+                    Icon(Icons.calendar_today, size: 35, color: Color(constants.primaryColor)),
                     Positioned(
                         top: 11,
                         child: Text(DateFormat('d').format(DateTime.now()), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),)

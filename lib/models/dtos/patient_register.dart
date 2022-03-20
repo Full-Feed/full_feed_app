@@ -10,7 +10,7 @@ class PatientRegisterDto {
   final String sex;
   final String birthDate;
   final String phone;
-  final String registerDate;
+  final int regionId;
   final double abdominal;
   final double arm;
   final double imc;
@@ -19,5 +19,5 @@ class PatientRegisterDto {
   final double weight;
 
   PatientRegisterDto(this.username, this.firstName, this.lastName, this.dni, this.email, this.password, this.rol, this.sex,
-      this.birthDate, this.phone, this.registerDate, this.abdominal, this.arm, this.imc, this.tmb, this.height, this.weight);
+      this.birthDate, this.phone, this.regionId, this.abdominal, this.arm, this.imc, this.tmb, this.height, this.weight);
 }

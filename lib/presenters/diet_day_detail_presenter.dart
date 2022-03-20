@@ -1,7 +1,53 @@
 
 
+import 'package:flutter/cupertino.dart';
+import 'package:full_feed_app/models/dtos/meal_replace_dto.dart';
+import 'package:full_feed_app/models/entities/meal.dart';
+
+class ProteinDetail {
+  final String protein;
+  final double q;
+
+  ProteinDetail(this.protein, this.q);
+}
+
+
 class DietDayDetailPresenter {
-  DietDayDetailPresenter();
+  var context;
+  List<ProteinDetail> chartData = [];
+
+  bool changeFood = false;
+  late List<Meal> dayMeals = [];
+  Meal mealSelected = Meal();
+  late MealReplaceDto mealToReplace;
+  List<String> ingredients = [];
+  Meal alternativeMeal = Meal();
+  late List<Meal> alternativeMealList = [];
+
+  DietDayDetailPresenter(BuildContext _context){
+    context = _context;
+  }
+
+  prepareNewMeal(){
+    mealToReplace = MealReplaceDto(mealSelected.mealId!, alternativeMeal.name!, alternativeMeal.carbohydrates!,
+        alternativeMeal.fat!, alternativeMeal.gramsPortion!, alternativeMeal.ingredients!, alternativeMeal.protein!, alternativeMeal.totalCalories!,
+        alternativeMeal.imageUrl!);
+  }
+
+  splitIngredients(bool alternative){
+    if(alternative){
+      ingredients = alternativeMeal.ingredients!.split('-');
+      for(int i =0; i<ingredients.length; i ++){
+        ingredients[i] = ingredients[i].substring(0, 1) + ingredients[i].substring(1).toLowerCase();
+      }
+    }
+    else{
+      ingredients = mealSelected.ingredients!.split('-');
+      for(int i =0; i<ingredients.length; i ++){
+        ingredients[i] = ingredients[i].substring(0, 1) + ingredients[i].substring(1).toLowerCase();
+      }
+    }
+  }
 
   setDay(int day){
     String dayName = "";
@@ -29,6 +75,30 @@ class DietDayDetailPresenter {
         break;
     }
     return dayName;
+  }
+
+
+  generateData(){
+
+    if(chartData.isNotEmpty){
+      chartData.clear();
+    }
+    if(alternativeMeal.name != null){
+      chartData = [
+        ProteinDetail('Peso', double.parse(alternativeMeal.gramsPortion.toString())),
+        ProteinDetail('Grasas', double.parse(alternativeMeal.fat.toString())),
+        ProteinDetail('Proteinas', double.parse(alternativeMeal.protein.toString())),
+        ProteinDetail('Carbohidratos', double.parse(alternativeMeal.carbohydrates.toString())),
+      ];
+    }
+    else{
+      chartData = [
+        ProteinDetail('Peso', double.parse(mealSelected.gramsPortion.toString())),
+        ProteinDetail('Grasas', double.parse(mealSelected.fat.toString())),
+        ProteinDetail('Proteinas', double.parse(mealSelected.protein.toString())),
+        ProteinDetail('Carbohidratos', double.parse(mealSelected.carbohydrates.toString())),
+      ];
+    }
   }
 
 }

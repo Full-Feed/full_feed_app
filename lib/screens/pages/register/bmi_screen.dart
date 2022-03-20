@@ -5,11 +5,13 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:full_feed_app/presenters/register_presenter.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
+import '../../../providers/user_provider.dart';
+
 class BMIScreen extends StatefulWidget {
-  RegisterPresenter presenter;
-  BMIScreen({Key? key, required this.presenter}) : super(key: key);
+  BMIScreen({Key? key}) : super(key: key);
 
   @override
   _BMIScreenState createState() => _BMIScreenState();
@@ -24,14 +26,14 @@ class _BMIScreenState extends State<BMIScreen> with AutomaticKeepAliveClientMixi
 
   @override
   void initState() {
-    widget.presenter.setImc();
+    Provider.of<UserProvider>(context, listen: false).registerPresenter.setImc();
     super.initState();
     showValue();
   }
 
   showValue(){
-    timer = Timer.periodic(Duration(milliseconds: 10), (_) {
-      if(_valueSlider < widget.presenter.imc){
+    timer = Timer.periodic(const Duration(milliseconds: 10), (_) {
+      if(_valueSlider < Provider.of<UserProvider>(context, listen: false).registerPresenter.imc){
         setState(() {
           _valueSlider += 0.1;
           if (_valueSlider >= 30.0) {

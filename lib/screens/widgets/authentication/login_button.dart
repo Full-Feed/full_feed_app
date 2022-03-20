@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/providers/user_provider.dart';
 import 'package:full_feed_app/screens/pages/home/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+
+import '../../../utilities/constants.dart';
 
 class LoginButton extends StatefulWidget {
-  const LoginButton({Key? key}) : super(key: key);
+
+  VoidCallback press;
+  LoginButton({Key? key, required this.press}) : super(key: key);
 
   @override
   _LoginButtonState createState() => _LoginButtonState();
 }
 
 class _LoginButtonState extends State<LoginButton> {
+  final constants = Constants();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -21,30 +29,22 @@ class _LoginButtonState extends State<LoginButton> {
           children: [
             Positioned.fill(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
                     colors: [
-                      Color(0xffFF295D),
+                      Color(constants.primaryColor),
                       Color(0xffFFC3E9),
                     ],
-                    stops: [0.01, 1],
+                    stops: [0.40, 1],
                   ),
                 ),
               ),
             ),
             Center(
               child: TextButton(
-                onPressed: (){
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          duration: const Duration(milliseconds: 200),
-                          reverseDuration: const Duration(milliseconds: 200),
-                          type: PageTransitionType.rightToLeft,
-                          child: HomeScreen()
-                      )
-                  );
-                },
+                onPressed: widget.press,
                 style: TextButton.styleFrom(
                   primary: Colors.white,
                   textStyle: const TextStyle(fontSize: 18),

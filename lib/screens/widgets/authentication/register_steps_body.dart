@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/utilities/constants.dart';
 
 class RegisterStepBody extends StatefulWidget {
   final String title;
@@ -17,11 +18,12 @@ class _RegisterStepBodyState extends State<RegisterStepBody> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final constants = Constants();
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFFFF295D),
+        backgroundColor: Color(constants.primaryColor),
         leading: Padding(
           padding: EdgeInsets.only(top: size.height/40, left: size.width/30),
           child: IconButton(onPressed: widget.arrowBackOnPressed,
@@ -34,15 +36,15 @@ class _RegisterStepBodyState extends State<RegisterStepBody> {
         ),
 
       ),
-      backgroundColor: Color(0xFFFF295D),
+      backgroundColor: Color(constants.primaryColor),
       body: Container(
         height: size.height,
         width: size.width,
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(25.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(30.0)),
           color: Colors.white,
         ),
-        margin: EdgeInsets.all(15.0),
+        margin: EdgeInsets.all(10.0),
         child: widget.child,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -50,13 +52,14 @@ class _RegisterStepBodyState extends State<RegisterStepBody> {
         padding: const EdgeInsets.only(bottom: 20.0),
         child: FloatingActionButton(
           onPressed: widget.fabOnPressed,
+          elevation: 2,
           child: Ink(
             width: 200,
             height: 200,
             decoration: ShapeDecoration(
                 shape: CircleBorder(),
                 gradient: LinearGradient(
-                    colors: [Color(0xFFFF295D), Color(0xFFFF9FC8)],
+                    colors: [Color(constants.primaryColor), Color(0xFFFF9FC8)],
                     stops: [0.05, 1]
                 )
             ),

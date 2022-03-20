@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/models/entities/user_session.dart';
+import 'package:full_feed_app/providers/user_provider.dart';
+import 'package:full_feed_app/screens/pages/chat/chat_screen.dart';
+import 'package:full_feed_app/screens/pages/diet_schedule/doctor_patients_list.dart';
+import 'package:full_feed_app/screens/pages/home/home_page_doctor.dart';
 import 'package:full_feed_app/utilities//constants.dart';
 import 'package:full_feed_app/screens/pages/diet_schedule/diet_calendar_page.dart';
 import 'package:full_feed_app/screens/pages/user/user_profile_screen.dart';
+import 'package:provider/provider.dart';
 
 
 import 'home_page.dart';
@@ -18,36 +24,50 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
 
   @override
+  void initState() {
+    Provider.of<UserProvider>(context, listen: false).initChatPresenter(context);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) => setState(() => currentIndex = index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(constants.bottomNavigationBarColor),
-        selectedItemColor: Colors.white70,
-        unselectedItemColor: Color(constants.itemSelectedColor),
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-        currentIndex: currentIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
+      bottomNavigationBar: Container(
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25.0),
+            topRight: Radius.circular(25.0),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Dieta',
+          child: BottomNavigationBar(
+            onTap: (index) => setState(() => currentIndex = index),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Color(constants.primaryColor),
+            selectedItemColor: Colors.white70,
+            unselectedItemColor: Color(constants.itemSelectedColor),
+            showUnselectedLabels: false,
+            showSelectedLabels: false,
+            currentIndex: currentIndex,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Inicio',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today),
+                label: 'Dieta',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.chat_bubble),
+                label: 'Chat',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.account_circle),
+                label: 'Perfil',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Perfil',
-          ),
-        ],
+        ),
       ),
       body: SafeArea(
         top: true,
@@ -75,12 +95,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding:
                     EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-                    child: HomePage(),
+                    child: UserSession().rol == 'p'? HomePage() : HomePageDoctor(),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: DietCalendarPage(),),
-                  HomePage(),
+                    padding: EdgeInsets.symmetric(horizontal: UserSession().rol == 'p'? 20.0 : 5.0),
+                    child: UserSession().rol == 'p'? DietCalendarPage() : DoctorPatientsList(),),
+                  ChatScreen(),
                   UserProfileScreen()
                 ],
               ),

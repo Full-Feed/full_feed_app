@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:full_feed_app/screens/pages/authentication/register_screen.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../../../utilities/constants.dart';
+
 class RegisterButton extends StatelessWidget {
-  const RegisterButton({Key? key}) : super(key: key);
+  RegisterButton({Key? key}) : super(key: key);
+
+  var constants = Constants();
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +31,16 @@ class RegisterButton extends StatelessWidget {
           height: 50,
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 3, color: const Color(0xffFF295D)),
+                border: Border.all(width: 3, color: Color(constants.primaryColor)),
                 borderRadius: const BorderRadius.all(Radius.circular(35.0))),
             padding:
             const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            child: const Center(
+            child: Center(
               child: Text(
                 'Regístrate',
                 style: TextStyle(
                   fontSize: 18.0,
-                  color: Color(0xffFF295D),
+                  color: Color(constants.primaryColor),
                 ),
               ),
             ),

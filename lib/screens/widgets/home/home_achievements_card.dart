@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/models/entities/user_session.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 
 
 class HomeAchievementsCard extends StatefulWidget {
-  final String completedDays;
-  final String lostWeight;
-  const HomeAchievementsCard({required this.completedDays, required this.lostWeight, Key? key}) : super(key: key);
+  const HomeAchievementsCard({Key? key}) : super(key: key);
 
   @override
   _HomeAchievementsCardState createState() => _HomeAchievementsCardState();
@@ -46,7 +45,7 @@ class _HomeAchievementsCardState extends State<HomeAchievementsCard> {
                     Image.asset(constants.trophyPath, width: 42, height: 42),
                     Positioned(
                       top: 2,
-                      child: Text(widget.completedDays,
+                      child: Text(UserSession().successfulDays.toString(),
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500,
                               color: Color(constants.trophyTextColor))
                       ),
@@ -56,7 +55,7 @@ class _HomeAchievementsCardState extends State<HomeAchievementsCard> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(widget.completedDays,
+                    Text(UserSession().successfulDays.toString(),
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
                     ),
                     const Text('Días', style: TextStyle(fontSize: 10.5)),
@@ -80,7 +79,7 @@ class _HomeAchievementsCardState extends State<HomeAchievementsCard> {
                     Image.asset(constants.bodyScalePath, width: 55, height: 55),
                     Positioned(
                       top: 20,
-                      child: Text(widget.lostWeight,
+                      child: Text(UserSession().lossWeight.toString(),
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500,
                               color: Color(constants.trophyTextColor))
                       ),
@@ -90,7 +89,7 @@ class _HomeAchievementsCardState extends State<HomeAchievementsCard> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(widget.lostWeight,
+                    Text(UserSession().lossWeight.toString(),
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
                     ),
                     const Flexible(child: Text('Kg perdidos', style: TextStyle(fontSize: 10.5)))

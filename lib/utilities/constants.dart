@@ -2,6 +2,9 @@
 
 class Constants {
   String url = "https://healthypurr.herokuapp.com/";
+
+  int primaryColor = 0xFFFF5956;
+
   int backgroundColor = 0xFFFF295C;
 
   int mainColor = 0xFFFF295C;
@@ -12,9 +15,9 @@ class Constants {
 
   int bottomNavigationBarColor = 0xFFFF295D;
 
-  int itemSelectedColor = 0xFFB90833;
+  int itemSelectedColor = 0xFFB02E2C;
 
-  int calendarColor = 0xFFFF295D;
+
 
   int containerUpperColor = 0xFFFED3C5;
 
@@ -55,4 +58,6 @@ class Constants {
   String logoTextPath = 'assets/fullfeedcolortext.png';
   String trophyPath = 'assets/trofeo.png';
   String bodyScalePath = 'assets/body_scale.png';
+  String innerCircle = 'assets/inner_circle.svg';
+  String externalCircle = 'assets/external_circle.svg';
 }

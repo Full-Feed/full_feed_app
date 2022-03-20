@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/models/entities/user_session.dart';
+import 'package:full_feed_app/providers/diet_provider.dart';
+import 'package:full_feed_app/providers/user_provider.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 import 'package:full_feed_app/screens/widgets/authentication/forgot_password_button.dart';
 import 'package:full_feed_app/screens/widgets/authentication/login_button.dart';
 import 'package:full_feed_app/screens/widgets/authentication/register_button.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+
+import '../home/home_screen.dart';
 
 
 class AuthenticationScreen extends StatefulWidget {
@@ -30,7 +36,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
     return Scaffold(
       body: Container(
-        color: Color(constants.backgroundColor),
+        color: Color(constants.primaryColor),
         height: size.height,
         width: size.width,
         child: Stack(
@@ -45,7 +51,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                 )
             ),
             Positioned(
-              top: size.height*0.45, bottom: 20, left: 20, right: 20,
+              top: size.height*0.45, bottom: 10, left: 10, right: 10,
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
                 height: size.height,
@@ -89,6 +95,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                               child: Padding(
                                 padding: EdgeInsets.only(top: size.height/80),
                                 child: TextFormField(
+                                  initialValue: 'siempreut@hotmail.com',
                                   textAlignVertical: TextAlignVertical.center,
                                   decoration: const InputDecoration(
                                     hintStyle: TextStyle(color: Colors.grey),
@@ -102,13 +109,12 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                     ),
                                   ),
                                   textInputAction: TextInputAction.next,
-                                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                                  onSaved: (value){
+                                    Provider.of<UserProvider>(context, listen: false).setEmail(value!);
+                                  },
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return "Ingrese un correo";
-                                    }
-                                    if (!value.contains("@")) {
-                                      return "Ingrese un correo valido";
                                     }
                                   },
                                 ),
@@ -133,6 +139,10 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                   ]
                               ),
                               child: TextFormField(
+                                initialValue: 'string',
+                                onSaved: (value){
+                                  Provider.of<UserProvider>(context, listen: false).setPassword(value!);
+                                },
                                 decoration: InputDecoration(
                                     border: const OutlineInputBorder(
                                       borderSide: BorderSide(
@@ -143,14 +153,13 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                     ),
                                     suffixIcon: InkWell(
                                       child: isHiddenPassword == true
-                                          ? const Icon(Icons.visibility, size: 20, color: Colors.redAccent,)
-                                          : const Icon(Icons.visibility_off, size: 20, color: Colors.redAccent,),
+                                          ? Icon(Icons.visibility, size: 20, color: Color(constants.primaryColor),)
+                                          : Icon(Icons.visibility_off, size: 20, color: Color(constants.primaryColor),),
                                       onTap: _togglePassword,
                                     )
                                 ),
                                 obscureText: isHiddenPassword,
                                 textInputAction: TextInputAction.done,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return "Ingrese una contraseña";
@@ -160,7 +169,51 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: size.width/20),
-                              child: LoginButton(),),
+                              child: LoginButton(press: (){
+                                final isValid = _formKey.currentState!.validate();
+                                if (isValid) {
+                                  _formKey.currentState!.save();
+                                  Provider.of<UserProvider>(context, listen: false).userLogin().then((value){
+                                    if(value){
+                                      Provider.of<DietProvider>(context, listen: false).initHomePresenter(context);
+                                      if(UserSession().rol == 'p'){
+                                        Provider.of<UserProvider>(context, listen: false).getDoctorByPatient(context).then((resp){
+                                          if(resp) {
+                                            Provider.of<UserProvider>(context, listen: false).getUserSuccessfulDays().then((response){
+                                              if(response){
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    PageTransition(
+                                                        duration: const Duration(milliseconds: 200),
+                                                        reverseDuration: const Duration(milliseconds: 200),
+                                                        type: PageTransitionType.rightToLeft,
+                                                        child: HomeScreen()
+                                                    )
+                                                );
+                                              }
+                                            });
+                                          }
+                                        });
+                                      }
+                                      else {
+                                        Provider.of<UserProvider>(context, listen: false).getPatientsByDoctor(context).then((response){
+                                          if(response){
+                                            Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                    duration: const Duration(milliseconds: 200),
+                                                    reverseDuration: const Duration(milliseconds: 200),
+                                                    type: PageTransitionType.rightToLeft,
+                                                    child: HomeScreen()
+                                                )
+                                            );
+                                          }
+                                        });
+                                      }
+                                    }
+                                  });
+                                }
+                              },),),
                             ForgotPasswordButton(),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: size.width/20, vertical: size.height/80),

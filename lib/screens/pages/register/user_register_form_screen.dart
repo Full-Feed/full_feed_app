@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:full_feed_app/presenters/register_presenter.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/user_provider.dart';
 
 class UserRegisterFormScreen extends StatefulWidget {
-  RegisterPresenter presenter;
-  UserRegisterFormScreen({Key? key, required this.presenter}) : super(key: key);
+  UserRegisterFormScreen({Key? key}) : super(key: key);
 
   @override
   UserRegisterFormScreenState createState() => UserRegisterFormScreenState();
@@ -18,12 +19,17 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
 
   File? image;
   final constants = Constants();
-  final _formKey = GlobalKey<FormState>();
   bool isHiddenPassword = true;
 
   void _togglePassword() {
     isHiddenPassword = !isHiddenPassword;
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    Provider.of<UserProvider>(context, listen: false).registerPresenter.userFormKey = GlobalKey(debugLabel: 'USER_REGISTER');
+    super.initState();
   }
 
   Future pickImage(ImageSource source) async {
@@ -53,7 +59,7 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
     return Column(
       children: [
         Form(
-          key: _formKey,
+          key: Provider.of<UserProvider>(context, listen: false).registerPresenter.userFormKey,
           child: Flexible(
             child: ListView(
               children: [
@@ -61,15 +67,15 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                   constraints: const BoxConstraints(maxHeight: 160, maxWidth: 140),
                   margin: const EdgeInsets.fromLTRB(100.0, 15.0, 100.0, 1.0),
                   decoration: BoxDecoration(
-                      color: const Color(0xFFFF295D),
+                      color: Color(constants.primaryColor),
                       borderRadius:
                       const BorderRadius.all(Radius.circular(20.0)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
+                          color: Colors.black.withOpacity(0.15),
                           spreadRadius: 1,
                           blurRadius: 1,
-                          offset: const Offset(0, 3),
+                          offset: const Offset(0, 4),
                         )
                       ]),
                   child: Column(
@@ -88,9 +94,9 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                             : Container(
                             decoration: const BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0), topRight: Radius.circular(15.0))),
-                            height: 130,
-                            width: 130,
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0))),
+                            height: 135,
+                            width: 145,
                             child: const Center(
                                 child: Icon(Icons.account_circle,
                                     size: 50.0, color: Colors.black38))),
@@ -129,11 +135,9 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
                       onChanged: (value){
-                        setState(() {
-                          widget.presenter.firstName = value;
-                        });
+                        Provider.of<UserProvider>(context, listen: false).registerPresenter.firstName = value;
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintStyle: TextStyle(color: Colors.grey),
                         hintText: 'Nombres',
                         border: OutlineInputBorder(
@@ -144,7 +148,6 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
                         ),),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Ingrese un nombre";
@@ -170,28 +173,64 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
-                      onChanged: (value){
-                        setState(() {
-                          widget.presenter.lastName = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                          hintStyle: TextStyle(color: Colors.grey),
-                          hintText: 'Apellidos',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0,
-                              style: BorderStyle.none,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                          )),
-                      textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese un apellido";
+                        onChanged: (value){
+                          Provider.of<UserProvider>(context, listen: false).registerPresenter.lastName = value;
+                        },
+                        decoration: const InputDecoration(
+                            hintStyle: TextStyle(color: Colors.grey),
+                            hintText: 'Apellidos',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                            )),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese un apellido";
+                          }
                         }
-                      },
+                    ),
+                  ),
+                ),
+                Container(
+                  height: size.height/20,
+                  decoration: BoxDecoration(
+                      color: Color(0XFFFAFAFA),
+                      borderRadius: const BorderRadius.all(Radius.circular(30.0)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 3,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(top: size.height/80),
+                    child: TextFormField(
+                        onChanged: (value){
+                          Provider.of<UserProvider>(context, listen: false).registerPresenter.dni = value;
+                        },
+                        decoration: const InputDecoration(
+                            hintStyle: TextStyle(color: Colors.grey),
+                            hintText: 'Dni',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                            )),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese su dni";
+                          }
+                        }
                     ),
                   ),
                 ),
@@ -213,11 +252,9 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
                       onChanged: (value){
-                        setState(() {
-                          widget.presenter.phone = value;
-                        });
+                        Provider.of<UserProvider>(context, listen: false).registerPresenter.phone = value;
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           hintStyle: TextStyle(color: Colors.grey),
                           hintText: 'Teléfono',
                           border: OutlineInputBorder(
@@ -228,12 +265,11 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                             borderRadius: BorderRadius.all(Radius.circular(30.0)),
                           )),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese un teléfono";
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese su telefono";
+                          }
                         }
-                      },
                     ),
                   ),
                 ),
@@ -255,11 +291,9 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
                       onChanged: (value){
-                        setState(() {
-                          widget.presenter.email = value;
-                        });
+                        Provider.of<UserProvider>(context, listen: false).registerPresenter.email = value;
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintStyle: TextStyle(color: Colors.grey),
                         hintText: 'Correo',
                         border: OutlineInputBorder(
@@ -269,15 +303,11 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(30.0))),),
                       textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese un correo";
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese su correo";
+                          }
                         }
-                        if (!value.contains("@")) {
-                          return "Ingrese un correo valido";
-                        }
-                      },
                     ),
                   ),
                 ),
@@ -299,14 +329,12 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
                       onChanged: (value){
-                        setState(() {
-                          widget.presenter.password = value;
-                        });
+                        Provider.of<UserProvider>(context, listen: false).registerPresenter.password = value;
                       },
                       decoration: InputDecoration(
-                          hintStyle: TextStyle(color: Colors.grey),
+                          hintStyle: const TextStyle(color: Colors.grey),
                           hintText: 'Contraseña',
-                          border: OutlineInputBorder(
+                          border: const OutlineInputBorder(
                               borderSide: BorderSide(
                                 width: 0,
                                 style: BorderStyle.none,
@@ -323,12 +351,11 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                           )),
                       obscureText: isHiddenPassword,
                       textInputAction: TextInputAction.done,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Ingrese una contraseña";
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Ingrese una contraseña";
+                          }
                         }
-                      },
                     ),
                   ),
                 ),

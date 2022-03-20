@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:full_feed_app/models/entities/doctor.dart';
+import 'package:full_feed_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class DropDown extends StatefulWidget {
 
@@ -41,14 +44,24 @@ class DropDownState extends State<DropDown> {
               elevation: 0,
               itemHeight: size.height/10,
               style: TextStyle(color: Colors.black, fontSize: size.width/25),
-              hint: SizedBox(child: Text(value, style: TextStyle(color: (value == 'Sexo') ? Colors.grey : Colors.black, fontSize: size.width/25),),),
+              hint: SizedBox(child: Text(value, style: TextStyle(color: (value == 'Sexo' || value == 'Doctor') ? Colors.grey : Colors.black, fontSize: size.width/25),),),
               dropdownColor: Color(0xFFF0F0F0),
               items: widget.datos,
               onChanged: (newValue) {
-                setState(() {
+                if(newValue is Doctor){
+                  setState(() {
+                    value = newValue.user!.firstName.toString();
+                    id = newValue.doctorId!;
+                    Provider.of<UserProvider>(context, listen: false).registerPresenter.doctorId = newValue.doctorId!;
+                  });
+                }
+                else{
+                  setState(() {
                     value = newValue.name;
                     id = newValue.id;
-                });
+                    Provider.of<UserProvider>(context, listen: false).registerPresenter.sex = newValue.name;
+                  });
+                }
               },
             )
         ));

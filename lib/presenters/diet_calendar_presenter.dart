@@ -1,5 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:full_feed_app/models/entities/patient.dart';
+import 'package:full_feed_app/providers/diet_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+
+import '../models/entities/meal.dart';
+import '../models/entities/user_session.dart';
 
 class DietCalendarPresenter {
   void onButtonClicked(String user, String password) {}
@@ -8,12 +14,22 @@ class DietCalendarPresenter {
 class BasicDietCalendarPresenter implements DietCalendarPresenter {
   var context;
   List<DateTime> daysForDetail = [];
+  late Patient patient;
   DateTime initial = DateTime.now();
   DateTime last = DateTime.now();
-  int dietFirstDay = DateTime.tuesday;
+  int dietFirstDay = 0;
+  late List<Meal> weekMealList;
   late DateRangePickerController controller;
+  bool firstDayEntry = true;
 
-  BasicDietCalendarPresenter(BuildContext _context, DateRangePickerController _controller) {
+  BasicDietCalendarPresenter(BuildContext _context, DateRangePickerController _controller, Patient? _patient) {
+    if(UserSession().rol == 'p'){
+      dietFirstDay = UserSession().firstDayOfWeek;
+    }
+    else{
+      patient = _patient!;
+      dietFirstDay = _patient.firstDayOfWeek!;
+    }
     context = _context;
     controller = _controller;
   }
@@ -42,7 +58,6 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
     for(int i = 0; i < 7; i ++){
       daysForDetail.add(initial.add(Duration(days: i)));
     }
-    return daysForDetail;
   }
 
   getWeek(DateRangePickerSelectionChangedArgs args){
@@ -130,5 +145,22 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
     last = dat2;
   }
 
+  List<Meal> getDayMeals(String date){
+    var dayMeals = weekMealList.where((element) => element.day!.substring(0, 10) == date).toList();
+    if(firstDayEntry){
+      Provider.of<DietProvider>(context, listen: false).setMealSelected(dayMeals[0]);
+      firstDayEntry = false;
+    }
+    return dayMeals;
+  }
+
+  setNewMeal(Meal meal){
+    for(int i = 0; i < weekMealList.length; i++){
+      if(weekMealList[i].mealId == meal.mealId){
+        weekMealList[i] = meal;
+      }
+    }
+
+  }
 
 }

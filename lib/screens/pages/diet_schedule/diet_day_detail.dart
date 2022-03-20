@@ -1,18 +1,28 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:full_feed_app/presenters/diet_day_detail_presenter.dart';
+import 'package:full_feed_app/providers/diet_provider.dart';
+import 'package:full_feed_app/screens/pages/home/home_screen.dart';
+import 'package:full_feed_app/screens/pages/register/welcome_screen.dart';
+import 'package:full_feed_app/screens/widgets/diet_schedule/shimmers/food_option_shimmer.dart';
 import 'package:full_feed_app/utilities//constants.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/food_detail.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/food_option.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/select_day_plate.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+
+import '../../../models/entities/meal.dart';
+import '../../widgets/diet_schedule/message.dart';
+import '../authentication/authentication_screen.dart';
 
 
 class DietDayDetail extends StatefulWidget {
 
-  List<DateTime> daysForDetail;
-
-  DietDayDetail({Key? key, required this.daysForDetail}) : super(key: key);
+  bool register;
+  DietDayDetail({Key? key, required this.register}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => DietDayDetailState();
@@ -21,13 +31,49 @@ class DietDayDetail extends StatefulWidget {
 
 class DietDayDetailState extends State<DietDayDetail> {
   final constants = Constants();
+  String date = "";
   int selected = 0;
-  late DietDayDetailPresenter presenter;
+  int foodSelected = 0;
+
 
   @override
   void initState() {
-    presenter = DietDayDetailPresenter();
+    Provider.of<DietProvider>(context, listen: false).dietPresenter.getDays();
+    date = DateFormat('yyyy-MM-dd').format(Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail[0]);
+    Provider.of<DietProvider>(context, listen: false).initDayDetailPresenter(context);
+    Provider.of<DietProvider>(context, listen: false).getAlternativeMeals(Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList.first);
     super.initState();
+  }
+
+  _showDialog(){
+    showDialog(
+      barrierColor: Colors.white70,
+      context: context,
+      builder: (BuildContext context) {
+        return Message(text: '¿Desea continuar con este plan dietético?', yesFunction: (){
+          Navigator.pushReplacement(
+              context,
+              PageTransition(
+                  duration: const Duration(milliseconds: 200),
+                  reverseDuration: const Duration(milliseconds: 200),
+                  type: PageTransitionType.rightToLeft,
+                  child: const WelcomeScreen()
+              )
+          );
+        }, noFunction: (){}, options: true,);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  refresh(String day){
+    setState(() {
+      date = day;
+    });
   }
 
 
@@ -38,97 +84,114 @@ class DietDayDetailState extends State<DietDayDetail> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(top: size2/25, left: size/50, right: size/50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.asset(constants.logoImagePath, width: 40,
-                      height: 40, fit: BoxFit.contain),
-                  Image.asset(constants.logoTextPath, width: 70,
-                      height: 70, fit: BoxFit.contain)
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () { Navigator.pop(context); },
-                  icon: Icon(CupertinoIcons.back, color: Color(constants.calendarColor),),
-                ),
-                Text("Semana 1", style: TextStyle(color: Color(constants.calendarColor), fontWeight: FontWeight.bold),)
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: size/15),
-              child: Wrap(
-                direction: Axis.horizontal,
-                children: List.generate(widget.daysForDetail.length, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selected = index;
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: selected == index? Color(constants.calendarColor) : Colors.white60
-                      ),
-                      child: Text(presenter.setDay(widget.daysForDetail[index].weekday), style: TextStyle(fontWeight: FontWeight.bold, color: selected == index? Colors.white70 : Colors.black),),
-                    ),
-                  );
-                }),),),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: size/50, vertical: size2/80),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 4,
-                        blurRadius: 2,
-                        offset: Offset(0, 2), // changes position of shadow
-                      ),
-                    ],
-                    color: Colors.white
-                ),
-                height: size2/1.35,
-                width: size,
-                child: Column(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SelectDayPlate(),
-                    FoodDetail(plato: "plato"),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: size/20),
-                      child: Row(
-                        children: [
-                          Text("Opciones"),
-                          IconButton(onPressed: () {}, icon: Icon(CupertinoIcons.refresh_thin, color: Color(constants.calendarColor), size: size/25,))
-                        ],
-                      ),),
-                    Wrap(
-                      direction: Axis.horizontal,
-                      children: List.generate(3, (index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selected = index;
-                            });
-                          },
-                          child: FoodOption(plato: 'Avena', selected: index == selected ? true : false, ),
-                        );
-                      }),)
+                    Image.asset(constants.logoImagePath, width: 40,
+                        height: 40, fit: BoxFit.contain),
+                    Image.asset(constants.logoTextPath, width: 70,
+                        height: 70, fit: BoxFit.contain)
                   ],
                 ),
-              ),)
-          ],
-        ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Provider.of<DietProvider>(context, listen: false).dietPresenter.firstDayEntry = true;
+                      Navigator.pop(context); },
+                    icon: Icon(CupertinoIcons.back, color: Color(constants.primaryColor),),
+                  ),
+                  Text("Semana 1", style: TextStyle(color: Color(constants.primaryColor), fontWeight: FontWeight.bold),)
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: size/15),
+                child: Wrap(
+                  direction: Axis.horizontal,
+                  children: List.generate( Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail.length, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selected = index;
+                          Provider.of<DietProvider>(context, listen: false).dietPresenter.firstDayEntry = true;
+                          date = DateFormat('yyyy-MM-dd').format(Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail[index]);
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: selected == index? Color(constants.primaryColor) : Colors.white60
+                        ),
+                        child: Text( Provider.of<DietProvider>(context).dayDetailPresenter.setDay(Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail[index].weekday), style: TextStyle(fontWeight: FontWeight.bold, color: selected == index? Colors.white70 : Colors.black),),
+                      ),
+                    );
+                  }),),),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: size/50, vertical: size2/80),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 4,
+                          blurRadius: 2,
+                          offset: const Offset(0, 2), // changes position of shadow
+                        ),
+                      ],
+                      color: Colors.white
+                  ),
+                  height:  widget.register == true ? size2 * 1.05 : size2/1.15,
+                  width: size,
+                  child: Column(
+                      children: [
+                        SelectDayPlate(dayMeals: Provider.of<DietProvider>(context).dietPresenter.getDayMeals(date),),
+                        FoodDetail( notifyParent: refresh,
+                            meal: (Provider.of<DietProvider>(context).dayDetailPresenter.changeFood) ? Provider.of<DietProvider>(context).dayDetailPresenter.alternativeMeal :
+                            Provider.of<DietProvider>(context).dayDetailPresenter.mealSelected),
+                        Visibility(
+                          visible: widget.register == true ? true: false,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: size2/20),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                        colors: [Color(0xFFFF295D), Color(0xFFFE7EB4)],
+                                        stops: [0.05, 1]
+                                    )
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _showDialog();
+                                  },
+                                  child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: size2/20,),
+                                  style: ElevatedButton.styleFrom(
+                                    maximumSize: Size( 200,  200),
+                                    elevation: 0,
+                                    shape: CircleBorder(),
+                                    padding: EdgeInsets.all(20),
+                                    primary: Colors.transparent, // <-- Button color
+                                    onPrimary: Colors.transparent, // <-- Splash color
+                                  ),
+                                ),
+                              )
+                          ),
+                        ),
+                      ],
+                    ),
+                ),),
+            ],
+          ),
+        )
       ),
     );
   }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:full_feed_app/presenters/register_presenter.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/user_provider.dart';
 
 class UserRoleScreen extends StatefulWidget {
-  RegisterPresenter presenter;
-  UserRoleScreen({Key? key, required this.presenter}) : super(key: key);
+  UserRoleScreen({Key? key}) : super(key: key);
 
   @override
   _UserRoleScreenState createState() => _UserRoleScreenState();
@@ -35,19 +37,19 @@ class _UserRoleScreenState extends State<UserRoleScreen> with
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
               side: BorderSide(
-                color: Color(constants.mainColor),
+                color: Color(constants.primaryColor),
                 width: 3.0,
               ),
             ),
             textStyle: const TextStyle(fontSize: 15),
             primary: selected == 1
-                ? Color(constants.mainColor)
+                ? Color(constants.primaryColor)
                 : Colors.white,
           ),
           onPressed: () {
             selected = selected == 1 ? 0 : 1;
             setState(() {
-              widget.presenter.setDesireRol(1);
+              Provider.of<UserProvider>(context, listen: false).registerPresenter.setDesireRol(1);
             });
           },
           child: Align(
@@ -59,8 +61,8 @@ class _UserRoleScreenState extends State<UserRoleScreen> with
                   style: GoogleFonts.raleway(
                       color: selected == 1
                           ? Colors.white
-                          : Color(constants.mainColor),
-                      fontSize: 20, fontWeight: FontWeight.w500),
+                          : Color(constants.primaryColor),
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 )),
           ),
         ),
@@ -74,19 +76,19 @@ class _UserRoleScreenState extends State<UserRoleScreen> with
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
               side: BorderSide(
-                color: Color(constants.mainColor),
+                color: Color(constants.primaryColor),
                 width: 3.0,
               ),
             ),
             textStyle: const TextStyle(fontSize: 15),
             primary: selected == 2
-                ? Color(constants.mainColor)
+                ? Color(constants.primaryColor)
                 : Colors.white,
           ),
           onPressed: () {
             selected = selected == 2 ? 0 : 2;
             setState(() {
-              widget.presenter.setDesireRol(2);
+              Provider.of<UserProvider>(context, listen: false).registerPresenter.setDesireRol(2);
             });
           },
           child: Align(
@@ -98,8 +100,8 @@ class _UserRoleScreenState extends State<UserRoleScreen> with
                   style: GoogleFonts.raleway(
                       color: selected == 2
                           ? Colors.white
-                          : Color(constants.mainColor),
-                      fontSize: 20, fontWeight: FontWeight.w500),
+                          : Color(constants.primaryColor),
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 )),
           ),
         ),
