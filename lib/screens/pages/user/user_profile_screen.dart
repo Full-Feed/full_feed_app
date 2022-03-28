@@ -224,7 +224,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with
                     setState(() {});
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(constants.primaryColor),
+                    primary: const Color(0xFF20D0CE),
                     fixedSize: const Size(350.0, 20.0),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),),
@@ -355,8 +355,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with
                   ),
                   primaryYAxis: NumericAxis(
                     majorGridLines: const MajorGridLines(width: 0),
-                    minimum: 75,
-                    maximum: 125,
+                    minimum: 50,
+                    maximum: 100,
                     interval: 10,
                     decimalPlaces: 1,
                     labelFormat: '{value} Kg',

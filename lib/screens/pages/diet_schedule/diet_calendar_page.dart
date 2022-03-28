@@ -22,15 +22,14 @@ class DietCalendarPage extends StatefulWidget {
 
 class DietCalendarPageState extends State<DietCalendarPage> {
   final constants = Constants();
-  final DateRangePickerController _controller = DateRangePickerController();
 
   @override
   void initState() {
     if(UserSession().rol == 'p'){
-      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, _controller, null);
+      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, null);
     }
     else{
-      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, _controller, widget.patient!);
+      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, widget.patient!);
     }
     Provider.of<DietProvider>(context, listen: false).dietPresenter.setCalendar();
     super.initState();
@@ -54,7 +53,7 @@ class DietCalendarPageState extends State<DietCalendarPage> {
     return Column(
       children: [
         SfDateRangePicker(
-          controller: _controller,
+          controller: Provider.of<DietProvider>(context, listen: false).dietPresenter.controller,
           onSelectionChanged: Provider.of<DietProvider>(context, listen: false).dietPresenter.getWeek,
           showNavigationArrow: false,
           headerStyle: DateRangePickerHeaderStyle(textStyle: TextStyle(color: Color(constants.primaryColor), fontWeight: FontWeight.bold, fontSize: 18)),
@@ -82,6 +81,7 @@ class DietCalendarPageState extends State<DietCalendarPage> {
               ),
               child: ElevatedButton(
                 onPressed: () async {
+                  Provider.of<DietProvider>(context, listen: false).dietPresenter.getDays();
                   if(UserSession().rol == 'p'){
                     await Provider.of<DietProvider>(context, listen: false).getWeekDietMeals().then((value){
                       if(value && Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList.isNotEmpty){
@@ -94,8 +94,11 @@ class DietCalendarPageState extends State<DietCalendarPage> {
                   }
                   else{
                     await Provider.of<DietProvider>(context, listen: false).getWeekDietMealsByPatient(Provider.of<DietProvider>(context, listen: false).dietPresenter.patient.patientId!).then((value){
-                      if(value){
+                      if(value && Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList.isNotEmpty){
                         Navigator.push(context, MaterialPageRoute(builder: (context) => DietDayDetail(register: false,)),);
+                      }
+                      else{
+                        _showDialog();
                       }
                     });
                   }

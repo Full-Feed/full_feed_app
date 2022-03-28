@@ -18,6 +18,7 @@ class ConnectionTags{
   //Patient
   final String patientEndpoint = "patient/";
   final String getDoctor = "doctor";
+  final String updatePatient = "updatePatient";
   final String successfulDays = "successfulDays";
   final String newNutritionalPlan = "generateDiet";
   final String validateAccessCode = "validateAccessCode";

@@ -40,9 +40,8 @@ class FoodDetailState extends State<FoodDetail> {
           Provider.of<DietProvider>(context, listen: false).dayDetailPresenter.prepareNewMeal();
           Provider.of<DietProvider>(context, listen: false).replaceMeal(Provider.of<DietProvider>(context, listen: false).dayDetailPresenter.mealToReplace).then((value){
             if(value.mealId != null){
-              Provider.of<DietProvider>(context, listen: false).dayDetailPresenter.mealSelected = value;
+              Provider.of<DietProvider>(context, listen: false).dayDetailPresenter.afterMealChanged(value);
               Provider.of<DietProvider>(context, listen: false).dietPresenter.setNewMeal(value);
-              widget.notifyParent(value.day!.substring(0, 10));
               Navigator.pop(context);
             }
           });

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_feed_app/providers/diet_provider.dart';
-import 'package:full_feed_app/providers/user_provider.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/doctor_patient.dart';
 import 'package:provider/provider.dart';
 

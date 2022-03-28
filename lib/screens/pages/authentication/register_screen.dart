@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:full_feed_app/models/dtos/patient_register.dart';
-import 'package:full_feed_app/models/entities/user.dart';
 import 'package:full_feed_app/presenters/register_presenter.dart';
 import 'package:full_feed_app/providers/user_provider.dart';
-import 'package:full_feed_app/screens/pages/diet_schedule/diet_day_detail.dart';
-import 'package:full_feed_app/screens/pages/home/home_screen.dart';
 import 'package:full_feed_app/screens/pages/register/bmi_screen.dart';
 import 'package:full_feed_app/screens/pages/register/loading_screen.dart';
 import 'package:full_feed_app/screens/pages/register/register_form_screen.dart';
@@ -20,7 +16,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
-import 'authentication_screen.dart';
 
 
 class RegisterScreen extends StatefulWidget {
@@ -149,12 +144,14 @@ class _RegisterUserFormState extends State<RegisterUserForm> {
               title: 'Alergias',
               child: UserAllergiesScreen(type: "ALLERGY",),
               fabOnPressed: () {
-                Provider.of<UserProvider>(context, listen: false).registerPreferences(Provider.of<UserProvider>(context, listen: false).registerPresenter.preferencesAllergy).then((value){
-                  if(value){
+                if(Provider.of<UserProvider>(context, listen: false).registerPresenter.preferencesAllergy.isNotEmpty){
+                  Provider.of<UserProvider>(context, listen: false).registerPreferences(Provider.of<UserProvider>(context, listen: false).registerPresenter.preferencesAllergy).whenComplete((){
                     Provider.of<UserProvider>(context, listen: false).registerPresenter.switchPage(GoToPage.waitForDiet);
-                  }
-                });
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.switchPage(GoToPage.waitForDiet);
+                  });
+                }
+                else{
+                  Provider.of<UserProvider>(context, listen: false).registerPresenter.switchPage(GoToPage.waitForDiet);
+                }
               },
               arrowBackOnPressed: (){Navigator.of(context, rootNavigator: true).pop();}
           ),

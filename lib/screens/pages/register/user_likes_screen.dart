@@ -35,7 +35,7 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
     return FutureBuilder(
         future: Provider.of<UserProvider>(context, listen: false).registerAndLogin(),
         builder: (context, snapshot){
-          if(snapshot.data == false || snapshot.data == null){
+          if((snapshot.data == false || snapshot.data == null)){
             return LoadingScreen(text: "Estamos configurando tu cuenta...", register: false,);
           }
           else{
@@ -56,20 +56,20 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: size.height/50),
                       child: Container(
-                        height: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length <= 3 ? size.height/5.5 :
-                        Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length <= 6 ? size.height/4.5 : size.height/2.8,
-                        width: size.width/1.45,
-                        child: Wrap(
-                          direction: Axis.horizontal,
-                          spacing: 6.0,
-                          runSpacing: 8.0,
-                          children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length, (index) =>
-                              FoodItem(
-                                type: "FAVORITE",
-                                preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats[index],
-                                imagePath: 'assets/1.png',
-                                color: 0xFFFED3C5,
-                              ),),
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
+                        child: Center(
+                          child: Wrap(
+                            direction: Axis.horizontal,
+                            spacing: 10.0,
+                            runSpacing: 10.0,
+                            children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length, (index) =>
+                                FoodItem(
+                                  type: "FAVORITE",
+                                  preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats[index],
+                                  imagePath: 'assets/1.png',
+                                  color: 0xFFFED3C5,
+                                ),),
+                          ),
                         ),
                       ),),
                     Padding(
@@ -80,13 +80,11 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: size.height/50),
                       child: Container(
-                        height: Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length <= 3 ? size.height/5.5 :
-                        Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length <= 6 ? size.height/4.5 : size.height/2.8,
-                        width: size.width/1.45,
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Wrap(
                           direction: Axis.horizontal,
-                          spacing: 6.0,
-                          runSpacing: 8.0,
+                          spacing: 10.0,
+                          runSpacing: 10.0,
                           children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length, (index) =>
                               FoodItem(
                                 type: "FAVORITE",
@@ -104,13 +102,11 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: size.height/50),
                       child: Container(
-                        height: Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length <= 3 ? size.height/5.5 :
-                        Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length <= 6 ? size.height/4.5 : size.height/2.8,
-                        width: size.width/1.45,
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Wrap(
                           direction: Axis.horizontal,
-                          spacing: 6.0,
-                          runSpacing: 8.0,
+                          spacing: 10.0,
+                          runSpacing: 10.0,
                           children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length, (index) =>
                               FoodItem(
                                 type: "FAVORITE",
@@ -128,13 +124,11 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: size.height/50),
                       child: Container(
-                        height: Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length <= 3 ? size.height/5.5 :
-                        Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length <= 6 ? size.height/4.5 : size.height/2.8,
-                        width: size.width/1.45,
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Wrap(
                           direction: Axis.horizontal,
-                          spacing: 6.0,
-                          runSpacing: 8.0,
+                          spacing: 10.0,
+                          runSpacing: 10.0,
                           children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length, (index) =>
                               FoodItem(
                                 type: "FAVORITE",
@@ -152,13 +146,11 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: size.height/50),
                       child: Container(
-                        height: Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length <= 3 ? size.height/5.5 :
-                        Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length <= 6 ? size.height/4.5 : size.height/2.8,
-                        width: size.width/1.45,
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Wrap(
                           direction: Axis.horizontal,
-                          spacing: 6.0,
-                          runSpacing: 8.0,
+                          spacing: 10.0,
+                          runSpacing: 10.0,
                           children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length, (index) =>
                               FoodItem(
                                 type: widget.type,
@@ -168,6 +160,9 @@ class _UserLikesScreenState extends State<UserLikesScreen> with
                               ),),
                         ),
                       ),),
+                    SizedBox(
+                      height: size.height/10,
+                    )
                   ],
                 ),
               ),

@@ -22,6 +22,7 @@ class DietProvider with ChangeNotifier {
   late BasicDietCalendarPresenter dietPresenter;
   late HomePresenter homePresenter;
   late DietDayDetailPresenter dayDetailPresenter;
+  bool firstDayEntry = true;
 
   homePresenterChange(){
     notifyListeners();
@@ -32,16 +33,16 @@ class DietProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  initDietPresenter(BuildContext context, DateRangePickerController _controller, Patient? patient){
-    dietPresenter = BasicDietCalendarPresenter(context, _controller, patient);
+  initDietPresenter(BuildContext context, Patient? patient){
+    dietPresenter = BasicDietCalendarPresenter(context, patient);
   }
 
   initHomePresenter(BuildContext context){
     homePresenter = HomePresenter(context);
   }
 
-  initDayDetailPresenter(BuildContext context){
-    dayDetailPresenter = DietDayDetailPresenter(context);
+  setDayDetailPresenter(int index){
+    dayDetailPresenter = dietPresenter.dayDetailPresenters[index];
   }
 
   setMealSelected(Meal selected){
@@ -71,7 +72,7 @@ class DietProvider with ChangeNotifier {
     response = await dio.get(api, queryParameters: {'endDate' : dateFormat.format(dietPresenter.last), 'patientId' : UserSession().profileId, 'startDate': dateFormat.format(dietPresenter.initial)});
     if(response.statusCode == 200){
       List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      dietPresenter.weekMealList = aux.cast<Meal>();
+      dietPresenter.initWeekMealList(aux.cast<Meal>());
       return true;
     }
     return false;
@@ -87,7 +88,7 @@ class DietProvider with ChangeNotifier {
     response = await dio.get(api, queryParameters: {'endDate' : dateFormat.format(dietPresenter.last), 'patientId' : patientId, 'startDate': dateFormat.format(dietPresenter.initial)});
     if(response.statusCode == 200){
       List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      dietPresenter.weekMealList = aux.cast<Meal>();
+      dietPresenter.initWeekMealList(aux.cast<Meal>());
       return true;
     }
     return false;
@@ -145,7 +146,7 @@ class DietProvider with ChangeNotifier {
     if(response.statusCode == 201){
       List aux = response.data['data'].map((e) => Meal.fromJson(e)).toList();
       Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList = aux.cast<Meal>();
-      Provider.of<DietProvider>(context, listen: false).dietPresenter.initial = DateTime.parse(response.data['data'][0]['day']);
+      Provider.of<DietProvider>(context, listen: false).dietPresenter.initDaysAtRegister(response.data['data'][0]['day']);
       return true;
     }
     return false;
@@ -186,6 +187,30 @@ class DietProvider with ChangeNotifier {
       return aux;
     }
     return Meal();
+  }
+
+  Future<bool> updatePatient(int patientId, double height, double weight, double imc) async {
+    final api = connectionTags.baseUrl + connectionTags.patientEndpoint + connectionTags.updatePatient;
+    final dio = Dio();
+    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
+
+    var patientUpdateDTO = {
+      "abdominal": 0,
+      "arm": 0,
+      "height": height,
+      "imc": imc,
+      "patientId": patientId,
+      "tmb": 0,
+      "weight": weight
+    };
+
+    Response response;
+    response = await dio.put(api, data: patientUpdateDTO);
+    if(response.statusCode == 200){
+      homePresenter.setPatientAfterUpdate(Patient.fromJson(response.data['data']));
+      return true;
+    }
+    return false;
   }
 
 }

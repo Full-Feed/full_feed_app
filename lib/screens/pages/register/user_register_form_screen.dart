@@ -212,6 +212,7 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
+                        keyboardType: TextInputType.number,
                         onChanged: (value){
                           Provider.of<UserProvider>(context, listen: false).registerPresenter.dni = value;
                         },
@@ -229,6 +230,9 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Ingrese su dni";
+                          }
+                          if (value.length != 8) {
+                            return "Ingrese un dni válido";
                           }
                         }
                     ),
@@ -251,6 +255,7 @@ class UserRegisterFormScreenState extends State<UserRegisterFormScreen> with
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
+                        keyboardType: TextInputType.number,
                       onChanged: (value){
                         Provider.of<UserProvider>(context, listen: false).registerPresenter.phone = value;
                       },

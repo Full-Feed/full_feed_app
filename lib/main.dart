@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:full_feed_app/providers/diet_provider.dart';
 import 'package:full_feed_app/providers/preferences_provider.dart';
 import 'package:full_feed_app/providers/user_provider.dart';
-import 'package:full_feed_app/screens/pages/authentication/authentication_screen.dart';
+import 'package:full_feed_app/screens/pages/authentication/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -26,8 +26,8 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     client = StreamChatClient(
-      '6gsk6ckqfxc9',
-      logLevel: Level.INFO,
+      '4u4qb3jxyjpa',
+      logLevel: Level.WARNING,
     );
     super.initState();
   }
@@ -60,7 +60,7 @@ class MyAppState extends State<MyApp> {
                 client: client,
               );
             },
-            home: AuthenticationScreen()
+            home: SplashScreen()
         )
     );
   }

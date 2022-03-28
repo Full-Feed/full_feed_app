@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:full_feed_app/models/entities/user_session.dart';
 import 'package:full_feed_app/providers/diet_provider.dart';
 import 'package:full_feed_app/providers/user_provider.dart';
+import 'package:full_feed_app/screens/pages/authentication/login_validate.dart';
 import 'package:full_feed_app/utilities/constants.dart';
 import 'package:full_feed_app/screens/widgets/authentication/forgot_password_button.dart';
 import 'package:full_feed_app/screens/widgets/authentication/login_button.dart';
@@ -24,6 +25,12 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final constants = Constants();
   final _formKey = GlobalKey<FormState>();
   bool isHiddenPassword = true;
+
+  @override
+  void initState() {
+    Provider.of<UserProvider>(context, listen: false).initLoginPresenter(context);
+    super.initState();
+  }
 
   void _togglePassword() {
     isHiddenPassword = !isHiddenPassword;
@@ -95,7 +102,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                               child: Padding(
                                 padding: EdgeInsets.only(top: size.height/80),
                                 child: TextFormField(
-                                  initialValue: 'siempreut@hotmail.com',
+                                  initialValue: Provider.of<UserProvider>(context, listen: false).email,
                                   textAlignVertical: TextAlignVertical.center,
                                   decoration: const InputDecoration(
                                     hintStyle: TextStyle(color: Colors.grey),
@@ -139,7 +146,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                   ]
                               ),
                               child: TextFormField(
-                                initialValue: 'string',
+                                initialValue:  Provider.of<UserProvider>(context, listen: false).password,
                                 onSaved: (value){
                                   Provider.of<UserProvider>(context, listen: false).setPassword(value!);
                                 },
@@ -173,45 +180,15 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                 final isValid = _formKey.currentState!.validate();
                                 if (isValid) {
                                   _formKey.currentState!.save();
-                                  Provider.of<UserProvider>(context, listen: false).userLogin().then((value){
-                                    if(value){
-                                      Provider.of<DietProvider>(context, listen: false).initHomePresenter(context);
-                                      if(UserSession().rol == 'p'){
-                                        Provider.of<UserProvider>(context, listen: false).getDoctorByPatient(context).then((resp){
-                                          if(resp) {
-                                            Provider.of<UserProvider>(context, listen: false).getUserSuccessfulDays().then((response){
-                                              if(response){
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    PageTransition(
-                                                        duration: const Duration(milliseconds: 200),
-                                                        reverseDuration: const Duration(milliseconds: 200),
-                                                        type: PageTransitionType.rightToLeft,
-                                                        child: HomeScreen()
-                                                    )
-                                                );
-                                              }
-                                            });
-                                          }
-                                        });
-                                      }
-                                      else {
-                                        Provider.of<UserProvider>(context, listen: false).getPatientsByDoctor(context).then((response){
-                                          if(response){
-                                            Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                    duration: const Duration(milliseconds: 200),
-                                                    reverseDuration: const Duration(milliseconds: 200),
-                                                    type: PageTransitionType.rightToLeft,
-                                                    child: HomeScreen()
-                                                )
-                                            );
-                                          }
-                                        });
-                                      }
-                                    }
-                                  });
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                          duration: const Duration(milliseconds: 200),
+                                          reverseDuration: const Duration(milliseconds: 200),
+                                          type: PageTransitionType.rightToLeft,
+                                          child: LoginValidate()
+                                      )
+                                  );
                                 }
                               },),),
                             ForgotPasswordButton(),

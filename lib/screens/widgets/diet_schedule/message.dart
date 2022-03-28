@@ -28,9 +28,11 @@ class MessageState extends State<Message> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Padding(padding: EdgeInsets.symmetric(
-        vertical: size.height/4, horizontal: size.width/20),
-      child: SizedBox(
+    return Material(
+      color: Colors.white24,
+      child: Padding(padding: EdgeInsets.symmetric(
+          vertical: size.height/4, horizontal: size.width/20),
+        child: SizedBox(
           width: 20,
           height: 20,
           child: Column(
@@ -82,6 +84,7 @@ class MessageState extends State<Message> {
             ],
           ),
         ),
-      );
+      ),
+    );
   }
 }

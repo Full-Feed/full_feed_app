@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:full_feed_app/models/entities/patient.dart';
+import 'package:full_feed_app/presenters/diet_day_detail_presenter.dart';
 import 'package:full_feed_app/providers/diet_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
@@ -19,10 +21,10 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
   DateTime last = DateTime.now();
   int dietFirstDay = 0;
   late List<Meal> weekMealList;
-  late DateRangePickerController controller;
-  bool firstDayEntry = true;
+  List<DietDayDetailPresenter> dayDetailPresenters = [];
+  final DateRangePickerController controller = DateRangePickerController();
 
-  BasicDietCalendarPresenter(BuildContext _context, DateRangePickerController _controller, Patient? _patient) {
+  BasicDietCalendarPresenter(BuildContext _context, Patient? _patient) {
     if(UserSession().rol == 'p'){
       dietFirstDay = UserSession().firstDayOfWeek;
     }
@@ -31,7 +33,23 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
       dietFirstDay = _patient.firstDayOfWeek!;
     }
     context = _context;
-    controller = _controller;
+  }
+
+  initDaysAtRegister(String date){
+    initial = DateTime.parse(date);
+    last = initial.add(const Duration(days: 6));
+    getDays();
+    initWeekMealList(weekMealList);
+  }
+
+  initWeekMealList(List<Meal> newList){
+    if(dayDetailPresenters.isNotEmpty){
+      dayDetailPresenters.clear();
+    }
+    weekMealList = newList;
+    for(int i = 0; i < daysForDetail.length; i++) {
+      dayDetailPresenters.add(DietDayDetailPresenter(context, getDayMeals( DateFormat('yyyy-MM-dd').format(daysForDetail[i]))));
+    }
   }
 
   @override
@@ -147,10 +165,6 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
 
   List<Meal> getDayMeals(String date){
     var dayMeals = weekMealList.where((element) => element.day!.substring(0, 10) == date).toList();
-    if(firstDayEntry){
-      Provider.of<DietProvider>(context, listen: false).setMealSelected(dayMeals[0]);
-      firstDayEntry = false;
-    }
     return dayMeals;
   }
 
@@ -160,7 +174,6 @@ class BasicDietCalendarPresenter implements DietCalendarPresenter {
         weekMealList[i] = meal;
       }
     }
-
   }
 
 }

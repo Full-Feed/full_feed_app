@@ -2,21 +2,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:full_feed_app/presenters/diet_day_detail_presenter.dart';
 import 'package:full_feed_app/providers/diet_provider.dart';
-import 'package:full_feed_app/screens/pages/home/home_screen.dart';
 import 'package:full_feed_app/screens/pages/register/welcome_screen.dart';
-import 'package:full_feed_app/screens/widgets/diet_schedule/shimmers/food_option_shimmer.dart';
 import 'package:full_feed_app/utilities//constants.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/food_detail.dart';
-import 'package:full_feed_app/screens/widgets/diet_schedule/food_option.dart';
+
 import 'package:full_feed_app/screens/widgets/diet_schedule/select_day_plate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/entities/meal.dart';
+
 import '../../widgets/diet_schedule/message.dart';
-import '../authentication/authentication_screen.dart';
 
 
 class DietDayDetail extends StatefulWidget {
@@ -31,16 +28,12 @@ class DietDayDetail extends StatefulWidget {
 
 class DietDayDetailState extends State<DietDayDetail> {
   final constants = Constants();
-  String date = "";
   int selected = 0;
   int foodSelected = 0;
 
-
   @override
   void initState() {
-    Provider.of<DietProvider>(context, listen: false).dietPresenter.getDays();
-    date = DateFormat('yyyy-MM-dd').format(Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail[0]);
-    Provider.of<DietProvider>(context, listen: false).initDayDetailPresenter(context);
+    Provider.of<DietProvider>(context, listen: false).setDayDetailPresenter(0);
     Provider.of<DietProvider>(context, listen: false).getAlternativeMeals(Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList.first);
     super.initState();
   }
@@ -72,7 +65,7 @@ class DietDayDetailState extends State<DietDayDetail> {
 
   refresh(String day){
     setState(() {
-      date = day;
+
     });
   }
 
@@ -104,7 +97,7 @@ class DietDayDetailState extends State<DietDayDetail> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      Provider.of<DietProvider>(context, listen: false).dietPresenter.firstDayEntry = true;
+                      Provider.of<DietProvider>(context, listen: false).firstDayEntry = true;
                       Navigator.pop(context); },
                     icon: Icon(CupertinoIcons.back, color: Color(constants.primaryColor),),
                   ),
@@ -120,8 +113,8 @@ class DietDayDetailState extends State<DietDayDetail> {
                       onTap: () {
                         setState(() {
                           selected = index;
-                          Provider.of<DietProvider>(context, listen: false).dietPresenter.firstDayEntry = true;
-                          date = DateFormat('yyyy-MM-dd').format(Provider.of<DietProvider>(context, listen: false).dietPresenter.daysForDetail[index]);
+                          Provider.of<DietProvider>(context, listen: false).setDayDetailPresenter(index);
+                          Provider.of<DietProvider>(context, listen: false).firstDayEntry = true;
                         });
                       },
                       child: Container(
@@ -153,7 +146,7 @@ class DietDayDetailState extends State<DietDayDetail> {
                   width: size,
                   child: Column(
                       children: [
-                        SelectDayPlate(dayMeals: Provider.of<DietProvider>(context).dietPresenter.getDayMeals(date),),
+                        SelectDayPlate(dayMeals: Provider.of<DietProvider>(context).dayDetailPresenter.dayMeals,),
                         FoodDetail( notifyParent: refresh,
                             meal: (Provider.of<DietProvider>(context).dayDetailPresenter.changeFood) ? Provider.of<DietProvider>(context).dayDetailPresenter.alternativeMeal :
                             Provider.of<DietProvider>(context).dayDetailPresenter.mealSelected),

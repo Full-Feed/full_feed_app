@@ -49,44 +49,44 @@ class UserAllergiesScreenState extends State<UserAllergiesScreen> with
             Padding(
               padding: EdgeInsets.symmetric(vertical: size.height/50),
               child: Container(
-                height: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length <= 3 ? size.height/5.5 :
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length <= 6 ? size.height/4.5 : size.height/2.8,
-                width: size.width/1.45,
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  spacing: 6.0,
-                  runSpacing: 8.0,
-                  children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length, (index) =>
-                      FoodItem(
-                        type: widget.type,
-                        preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats[index],
-                        imagePath: 'assets/1.png',
-                        color: 0xFFFED3C5,
-                      ),),
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Center(
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.meats.length, (index) =>
+                        FoodItem(
+                          type: widget.type,
+                          preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.meats[index],
+                          imagePath: 'assets/1.png',
+                          color: 0xFFFED3C5,
+                        ),),
+                  ),
                 ),
               ),),
             Padding(
               padding: EdgeInsets.only(left: size.width/10),
-              child: Align(
+              child: const Align(
                   alignment: Alignment.topLeft,
                   child: Text('Mariscos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)),),
             Padding(
               padding: EdgeInsets.symmetric(vertical: size.height/50),
               child: Container(
-                height: Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length <= 3 ? size.height/5.5 :
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length <= 6 ? size.height/4.5 : size.height/2.8,
-                width: size.width/1.45,
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  spacing: 6.0,
-                  runSpacing: 8.0,
-                  children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length, (index) =>
-                      FoodItem(
-                        type: widget.type,
-                        preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood[index],
-                        imagePath: 'assets/1.png',
-                        color: 0xFFD2E6FA,
-                      ),),
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Center(
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood.length, (index) =>
+                        FoodItem(
+                          type: widget.type,
+                          preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.seafood[index],
+                          imagePath: 'assets/1.png',
+                          color: 0xFFD2E6FA,
+                        ),),
+                  ),
                 ),
               ),),
             Padding(
@@ -97,20 +97,20 @@ class UserAllergiesScreenState extends State<UserAllergiesScreen> with
             Padding(
               padding: EdgeInsets.symmetric(vertical: size.height/50),
               child: Container(
-                height: Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length <= 3 ? size.height/5.5 :
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length <= 6 ? size.height/4.5 : size.height/2.8,
-                width: size.width/1.45,
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  spacing: 6.0,
-                  runSpacing: 8.0,
-                  children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length, (index) =>
-                      FoodItem(
-                        type: widget.type,
-                        preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables[index],
-                        imagePath: 'assets/1.png',
-                        color: 0xFFC7F5E2,
-                      ),),
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Center(
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables.length, (index) =>
+                        FoodItem(
+                          type: widget.type,
+                          preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.vegetables[index],
+                          imagePath: 'assets/1.png',
+                          color: 0xFFC7F5E2,
+                        ),),
+                  ),
                 ),
               ),),
             Padding(
@@ -121,20 +121,21 @@ class UserAllergiesScreenState extends State<UserAllergiesScreen> with
             Padding(
               padding: EdgeInsets.symmetric(vertical: size.height/50),
               child: Container(
-                height: Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length <= 3 ? size.height/5.5 :
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length <= 6 ? size.height/4.5 : size.height/2.8,
-                width: size.width/1.45,
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  spacing: 6.0,
-                  runSpacing: 8.0,
-                  children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length, (index) =>
-                      FoodItem(
-                        type: widget.type,
-                        preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers[index],
-                        imagePath: 'assets/1.png',
-                        color: constants.proteinItemColor,
-                      ),),
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Center(
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers.length, (index) =>
+                        FoodItem(
+                          type: widget.type,
+                          preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.tubers[index],
+                          imagePath: 'assets/1.png',
+                          color: constants.proteinItemColor,
+                        ),
+                    ),
+                  ),
                 ),
               ),),
             Padding(
@@ -145,22 +146,25 @@ class UserAllergiesScreenState extends State<UserAllergiesScreen> with
             Padding(
               padding: EdgeInsets.symmetric(vertical: size.height/50),
               child: Container(
-                height: Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length <= 3 ? size.height/5.5 :
-                Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length <= 6 ? size.height/4.5 : size.height/2.8,
-                width: size.width/1.45,
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  spacing: 6.0,
-                  runSpacing: 8.0,
-                  children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length, (index) =>
-                      FoodItem(
-                        type: widget.type,
-                        preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits[index],
-                        imagePath: 'assets/1.png',
-                        color: 0xFFFCE0FB,
-                      ),),
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Center(
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 10.0,
+                    runSpacing: 8.0,
+                    children: List.generate(Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits.length, (index) =>
+                        FoodItem(
+                          type: widget.type,
+                          preference: Provider.of<UserProvider>(context, listen: false).registerPresenter.fruits[index],
+                          imagePath: 'assets/1.png',
+                          color: 0xFFFCE0FB,
+                        ),),
+                  ),
                 ),
               ),),
+            SizedBox(
+              height: size.height/10,
+            )
           ],
         ),
       ),

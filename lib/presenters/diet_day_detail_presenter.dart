@@ -16,6 +16,7 @@ class DietDayDetailPresenter {
   var context;
   List<ProteinDetail> chartData = [];
 
+  int selected = 0;
   bool changeFood = false;
   late List<Meal> dayMeals = [];
   Meal mealSelected = Meal();
@@ -24,14 +25,27 @@ class DietDayDetailPresenter {
   Meal alternativeMeal = Meal();
   late List<Meal> alternativeMealList = [];
 
-  DietDayDetailPresenter(BuildContext _context){
+  DietDayDetailPresenter(BuildContext _context, List<Meal> meals){
     context = _context;
+    dayMeals = meals;
+    mealSelected = dayMeals[0];
+    splitIngredients(false);
+    generateData();
   }
 
   prepareNewMeal(){
     mealToReplace = MealReplaceDto(mealSelected.mealId!, alternativeMeal.name!, alternativeMeal.carbohydrates!,
         alternativeMeal.fat!, alternativeMeal.gramsPortion!, alternativeMeal.ingredients!, alternativeMeal.protein!, alternativeMeal.totalCalories!,
         alternativeMeal.imageUrl!);
+  }
+
+  afterMealChanged(Meal newMeal){
+    for(int i = 0; i < dayMeals.length; i++){
+      if(dayMeals[i].mealId == newMeal.mealId){
+        dayMeals[i] = newMeal;
+      }
+    }
+    mealSelected = newMeal;
   }
 
   splitIngredients(bool alternative){

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_feed_app/models/entities/patient.dart';
+import 'package:full_feed_app/screens/pages/diet_schedule/update_patient_dialog.dart';
 import 'package:full_feed_app/screens/widgets/diet_schedule/patient_detail_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 import '../../../presenters/profile_presenter.dart';
+import '../../../providers/diet_provider.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utilities/constants.dart';
 import 'diet_calendar_page.dart';
@@ -38,12 +40,20 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
   bool isPressed = false;
   final PageController _pageController = PageController(initialPage: GoToPage.carbohydrates);
   late PageController _dietPageController;
+  late var _futureConsumedBalance;
+  late var _weightHistory;
 
   void _switchPage(int page) {
     _pageController.animateToPage(page,
         duration: const Duration(seconds: 1),
         curve: Curves.linear
     );
+  }
+
+  updatePatient(){
+    setState(() {
+      widget.patient = Provider.of<DietProvider>(context, listen: false).homePresenter.getPatientAt(widget.patient.patientId!);
+    });
   }
 
   void _switchDietPage(int page) {
@@ -57,7 +67,21 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
   @override
   void initState() {
     _dietPageController = PageController(initialPage: 0);
+    _weightHistory = Provider.of<UserProvider>(context, listen: false).getWeightEvolutionByPatient(widget.patient.patientId!);
+    _futureConsumedBalance = Provider.of<UserProvider>(context, listen: false).getConsumedBalanceByPatient(widget.patient.patientId!);
     super.initState();
+  }
+
+  _showDialog(){
+    showDialog(
+      barrierColor: Colors.white70,
+      context: context,
+      builder: (BuildContext context) {
+        return UpdatePatientDialog(patientId: widget.patient.patientId!);
+      },
+    ).then((value){
+      updatePatient();
+    });
   }
 
   @override
@@ -139,8 +163,8 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                     Container(
                                         width: 80,
                                         height: 80,
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(Radius.circular(100.0)),
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(100.0)),
                                           color: Color(0xFFFFBAB9),
                                         ),
                                         child: Center(
@@ -152,16 +176,41 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(widget.patient.user!.lastName.toString(), style: TextStyle(fontWeight: FontWeight.w300),),
-                                        Text(widget.patient.user!.firstName.toString(), style: TextStyle(fontWeight: FontWeight.w300)),
+                                        SizedBox(
+                                          width: size.width/1.7,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(widget.patient.user!.lastName.toString(), style: TextStyle(fontWeight: FontWeight.w300),),
+                                                  Text(widget.patient.user!.firstName.toString(), style: TextStyle(fontWeight: FontWeight.w300)),
+                                                ],
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Color(0xFF20D0CE),
+                                                    shape: BoxShape.circle
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () { _showDialog(); },
+                                                  icon: Icon(Icons.edit),
+                                                  color: Colors.white,
+                                                  iconSize: 30,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                         Container(
                                           padding: EdgeInsets.only(top: size.height/50),
                                           width: size.width/2,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(widget.patient.user!.email.toString(), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w300, fontSize: 10)),
-                                              Text(widget.patient.user!.phone.toString(), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w300, fontSize: 10)),
+                                              Text(widget.patient.user!.email.toString(), style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w300, fontSize: 10)),
+                                              Text(widget.patient.user!.phone.toString(), style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w300, fontSize: 10)),
                                             ],
                                           ),
                                         )
@@ -177,7 +226,7 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                     children: [
                                       PatientDetailCard(asset: "assets/height.svg", text: (widget.patient.height! / 100).toString() + " m", title: "Altura"),
                                       PatientDetailCard(asset: "assets/weight.svg", text: widget.patient.weight.toString() + " kg", title: "Peso"),
-                                      PatientDetailCard(asset: "assets/bmi.svg", text: widget.patient.imc.toString(), title: "Imc"),
+                                      PatientDetailCard(asset: "assets/bmi.svg", text: widget.patient.imc!.toStringAsFixed(2), title: "Imc"),
                                       PatientDetailCard(asset: "assets/age.svg", text: widget.patient.age.toString(), title: "Edad")
                                     ],
                                   ),
@@ -217,7 +266,7 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       elevation: 0,
-                                      primary: Color(constants.primaryColor),
+                                      primary: const Color(0xFF20D0CE),
                                       fixedSize: const Size(350.0, 15.0),
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(50)),),
@@ -258,72 +307,88 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                 SizedBox(
                                   width: size.width,
                                   height: size.height / 5.5,
-                                  child: PageView(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      controller: _pageController,
-                                      children: [
-                                        SfCartesianChart(
-                                          plotAreaBorderWidth: 0,
-                                          zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
-                                          tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
-                                          primaryXAxis: CategoryAxis(
-                                            majorGridLines: const MajorGridLines(width: 0),
-                                            labelPlacement: LabelPlacement.betweenTicks,
-                                            interval: 1,
-                                            labelStyle: GoogleFonts.lato(),
+                                  child: FutureBuilder<List>(
+                                    future: _futureConsumedBalance,
+                                    builder: (context, snapshot){
+                                      if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                                        return PageView(
+                                            physics: const NeverScrollableScrollPhysics(),
+                                            controller: _pageController,
+                                            children: [
+                                              SfCartesianChart(
+                                                plotAreaBorderWidth: 0,
+                                                zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
+                                                tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
+                                                primaryXAxis: CategoryAxis(
+                                                  majorGridLines: const MajorGridLines(width: 0),
+                                                  labelPlacement: LabelPlacement.betweenTicks,
+                                                  interval: 1,
+                                                  labelStyle: GoogleFonts.lato(),
+                                                ),
+                                                primaryYAxis: NumericAxis(
+                                                  majorGridLines: const MajorGridLines(width: 0),
+                                                  minimum: 0,
+                                                  maximum: 250,
+                                                  interval: 50,
+                                                  decimalPlaces: 1,
+                                                  labelFormat: '{value} kcal',
+                                                  labelStyle: GoogleFonts.lato(),
+                                                ),
+                                                series: <CartesianSeries> [
+                                                  ColumnSeries<CarbohydrateData, String>(
+                                                    dataSource: snapshot.data![0],
+                                                    yValueMapper: (CarbohydrateData carbohydrate, _)
+                                                    => carbohydrate.kCal,
+                                                    xValueMapper: (CarbohydrateData carbohydrate, _)
+                                                    => carbohydrate.days.toString(),
+                                                    color: Color(constants.columnChartColor),
+                                                    width: 0.5,
+                                                  ),
+                                                ],
+                                              ),
+                                              SfCartesianChart(
+                                                plotAreaBorderWidth: 0,
+                                                zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
+                                                tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
+                                                primaryXAxis: CategoryAxis(
+                                                  majorGridLines: const MajorGridLines(width: 0),
+                                                  labelPlacement: LabelPlacement.betweenTicks,
+                                                  interval: 1,
+                                                  labelStyle: GoogleFonts.lato(),
+                                                ),
+                                                primaryYAxis: NumericAxis(
+                                                  majorGridLines: const MajorGridLines(width: 0),
+                                                  minimum: 0,
+                                                  maximum: 250,
+                                                  interval: 50,
+                                                  decimalPlaces: 1,
+                                                  labelFormat: '{value} kcal',
+                                                  labelStyle: GoogleFonts.lato(),
+                                                ),
+                                                series: <CartesianSeries> [
+                                                  ColumnSeries<ProteinData, String>(
+                                                    dataSource: snapshot.data![1],
+                                                    yValueMapper: (ProteinData protein, _) => protein.kCal,
+                                                    xValueMapper: (ProteinData protein, _) => protein.days.toString(),
+                                                    color: Color(constants.columnChartColor),
+                                                    width: 0.5,
+                                                  ),
+                                                ],
+                                              ),
+                                            ]
+                                        );
+                                      }
+                                      else{
+                                        return Center(
+                                          child: SizedBox(
+                                            height: 10,
+                                            width: 10,
+                                            child: CircularProgressIndicator(strokeWidth: 3, color: Color(constants.primaryColor),),
                                           ),
-                                          primaryYAxis: NumericAxis(
-                                            majorGridLines: const MajorGridLines(width: 0),
-                                            minimum: 0,
-                                            maximum: 250,
-                                            interval: 50,
-                                            decimalPlaces: 1,
-                                            labelFormat: '{value} kcal',
-                                            labelStyle: GoogleFonts.lato(),
-                                          ),
-                                          series: <CartesianSeries> [
-                                            ColumnSeries<CarbohydrateData, String>(
-                                              dataSource: Provider.of<UserProvider>(context, listen: false).profilePresenter.carbohydrateChartData,
-                                              yValueMapper: (CarbohydrateData carbohydrate, _)
-                                              => carbohydrate.kCal,
-                                              xValueMapper: (CarbohydrateData carbohydrate, _)
-                                              => carbohydrate.days.toString(),
-                                              color: Color(constants.columnChartColor),
-                                              width: 0.5,
-                                            ),
-                                          ],
-                                        ),
-                                        SfCartesianChart(
-                                          plotAreaBorderWidth: 0,
-                                          zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
-                                          tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
-                                          primaryXAxis: CategoryAxis(
-                                            majorGridLines: const MajorGridLines(width: 0),
-                                            labelPlacement: LabelPlacement.betweenTicks,
-                                            interval: 1,
-                                            labelStyle: GoogleFonts.lato(),
-                                          ),
-                                          primaryYAxis: NumericAxis(
-                                            majorGridLines: const MajorGridLines(width: 0),
-                                            minimum: 0,
-                                            maximum: 250,
-                                            interval: 50,
-                                            decimalPlaces: 1,
-                                            labelFormat: '{value} kcal',
-                                            labelStyle: GoogleFonts.lato(),
-                                          ),
-                                          series: <CartesianSeries> [
-                                            ColumnSeries<ProteinData, String>(
-                                              dataSource: Provider.of<UserProvider>(context, listen: false).profilePresenter.proteinChartData,
-                                              yValueMapper: (ProteinData protein, _) => protein.kCal,
-                                              xValueMapper: (ProteinData protein, _) => protein.days.toString(),
-                                              color: Color(constants.columnChartColor),
-                                              width: 0.5,
-                                            ),
-                                          ],
-                                        ),
-                                      ]
-                                  ),
+                                        );
+                                      }
+                                    },
+                                  )
                                 ),
                               ],
                             ),
@@ -363,35 +428,51 @@ class DietDayPatientDetailState extends State<DietDayPatientDetail> {
                                   padding: EdgeInsets.only(top: 10),
                                   width: size.width,
                                   height: size.height / 4.5,
-                                  child: SfCartesianChart(
-                                    plotAreaBorderWidth: 0,
-                                    zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
-                                    tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
-                                    primaryXAxis: CategoryAxis(
-                                      majorGridLines: const MajorGridLines(width: 0),
-                                      labelPlacement: LabelPlacement.betweenTicks,
-                                      interval: 1,
-                                      labelStyle: GoogleFonts.lato(),
-                                    ),
-                                    primaryYAxis: NumericAxis(
-                                      majorGridLines: const MajorGridLines(width: 0),
-                                      minimum: 75,
-                                      maximum: 125,
-                                      interval: 10,
-                                      decimalPlaces: 1,
-                                      labelFormat: '{value} Kg',
-                                      labelStyle: GoogleFonts.lato(),
-                                    ),
-                                    series: <ChartSeries> [
-                                      LineSeries<WeightData, String>(
-                                        dataSource: Provider.of<UserProvider>(context, listen: false).profilePresenter.chartData,
-                                        yValueMapper: (WeightData weight, _) => weight.lostWeight,
-                                        xValueMapper: (WeightData weight, _) => weight.month.toString(),
-                                        color: Color(constants.chartLineColor),
-                                        width: 2,
-                                      ),
-                                    ],
-                                  ),
+                                  child: FutureBuilder<List<WeightData>>(
+                                    future: _weightHistory,
+                                    builder: (context, snapshot){
+                                      if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                                        return SfCartesianChart(
+                                          plotAreaBorderWidth: 0,
+                                          zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
+                                          tooltipBehavior: TooltipBehavior(enable: true, header: '', canShowMarker: true),
+                                          primaryXAxis: CategoryAxis(
+                                            majorGridLines: const MajorGridLines(width: 0),
+                                            labelPlacement: LabelPlacement.betweenTicks,
+                                            interval: 1,
+                                            labelStyle: GoogleFonts.lato(),
+                                          ),
+                                          primaryYAxis: NumericAxis(
+                                            majorGridLines: const MajorGridLines(width: 0),
+                                            minimum: 50,
+                                            maximum: 100,
+                                            interval: 10,
+                                            decimalPlaces: 1,
+                                            labelFormat: '{value} Kg',
+                                            labelStyle: GoogleFonts.lato(),
+                                          ),
+                                          series: <ChartSeries> [
+                                            LineSeries<WeightData, String>(
+                                              dataSource: snapshot.data!,
+                                              yValueMapper: (WeightData weight, _) => weight.lostWeight,
+                                              xValueMapper: (WeightData weight, _) => weight.month.toString(),
+                                              color: Color(constants.chartLineColor),
+                                              width: 2,
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                      else{
+                                        return Center(
+                                          child: SizedBox(
+                                            height: 10,
+                                            width: 10,
+                                            child: CircularProgressIndicator(strokeWidth: 3, color: Color(constants.primaryColor),),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  )
                                 ),
                               ],
                             ),

@@ -29,20 +29,29 @@ class ChatPresenter{
             "name" : UserSession().userFirstName
           }
       ),
-      client.devToken(UserSession().userId.toString()).rawValue,).then((value){
-        initChannels();
+      client.devToken(UserSession().userId.toString()).rawValue,).whenComplete((){
+      initChannels();
     });
   }
 
   initChannels(){
     if(UserSession().rol == 'p'){
-      userChannels.add(client.channel('messaging', id: "doctor${Provider.of<DietProvider>(context, listen: false).homePresenter.doctorByPatient.user!.userId.toString()}patient${UserSession().userId.toString()}"));
+      String doctorId = Provider.of<DietProvider>(context, listen: false).homePresenter.doctorByPatient.user!.userId.toString();
+      userChannels.add(client.channel('messaging', id: "doctor${doctorId}patient${UserSession().userId.toString()}"));
+      /*if(userChannels[0].memberCount == 0){
+        userChannels[0].addMembers([ UserSession().userId.toString(), doctorId]);
+      }*/
     }
     else{
       List<Patient> patientsChat = Provider.of<DietProvider>(context, listen: false).homePresenter.patientsByDoctor;
       for(int i = 0; i < patientsChat.length; i++){
         userChannels.add(client.channel('messaging', id: "doctor${UserSession().userId.toString()}patient${patientsChat[i].user!.userId.toString()}"));
       }
+      /*for(int i = 0; i < userChannels.length; i++){
+        if(userChannels[i].memberCount == 0){
+          userChannels[i].addMembers([ UserSession().userId.toString(), patientsChat[i].user!.userId.toString()]);
+        }
+      }*/
     }
     getLastMessages();
   }
@@ -50,8 +59,10 @@ class ChatPresenter{
   getLastMessages() async{
     for(int i = 0; i < userChannels.length; i++){
       await userChannels[i].watch().then((value){
-        if(value.messages.last.user!.name != UserSession().userFirstName){
-          lastMessages.add(value.messages.last);
+        if(value.messages.isNotEmpty){
+          if(value.messages.last.user!.name != UserSession().userFirstName){
+            lastMessages.add(value.messages.last);
+          }
         }
         Provider.of<UserProvider>(context, listen: false).setMessages(true);
       });

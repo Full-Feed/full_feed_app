@@ -1,7 +1,6 @@
 
 
 class Constants {
-  String url = "https://healthypurr.herokuapp.com/";
 
   int primaryColor = 0xFFFF5956;
 

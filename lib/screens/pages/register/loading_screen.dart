@@ -29,17 +29,15 @@ class LoadingScreenState extends State<LoadingScreen> with TickerProviderStateMi
   late AnimationController controller;
   late Animation<double> innerAnimation;
   late Animation<double> externalAnimation;
-  final DateRangePickerController _controller = DateRangePickerController();
 
   @override
   void initState() {
-    controller = AnimationController(vsync: this, duration: Duration(seconds: 3));
+    controller = AnimationController(vsync: this, duration: const Duration(seconds: 3));
     innerAnimation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     externalAnimation = CurvedAnimation(parent: controller, curve: Curves.easeOut);
     super.initState();
     if(widget.register){
-      Provider.of<DietProvider>(context, listen: false).initHomePresenter(context);
-      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, _controller, null);
+      Provider.of<DietProvider>(context, listen: false).initDietPresenter(context, null);
       register();
     }
     controller.repeat();

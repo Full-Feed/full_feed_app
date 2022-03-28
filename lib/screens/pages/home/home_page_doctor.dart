@@ -50,7 +50,8 @@ class HomePageDoctorState extends State<HomePageDoctor> {
           child: Text.rich(TextSpan(
               children: [
                 const TextSpan(text: 'Bienvenido de nuevo, ', style: TextStyle(fontSize: 16)),
-                TextSpan(text: UserSession().userFirstName.substring(0, UserSession().userFirstName.lastIndexOf(" ")), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                TextSpan(text: UserSession().userFirstName.contains(" ")? UserSession().userFirstName.substring(0, UserSession().userFirstName.lastIndexOf(" ")) : UserSession().userFirstName,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
               ])
           ),
         ),

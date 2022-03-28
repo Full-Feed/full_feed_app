@@ -220,6 +220,7 @@ class RolRegisterFormScreenState extends State<RolRegisterFormScreen> with
                   child: Padding(
                     padding: EdgeInsets.only(top: size.height/80),
                     child: TextFormField(
+                      keyboardType: TextInputType.number,
                       onChanged: (value){
                         setState(() {
                           Provider.of<UserProvider>(context, listen: false).registerPresenter.licenseNumber = value;
