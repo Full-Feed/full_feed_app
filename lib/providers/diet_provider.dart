@@ -1,216 +1,72 @@
 
-import 'dart:convert';
 
-import 'package:dio/dio.dart';
+
 import 'package:flutter/cupertino.dart';
-import 'package:full_feed_app/models/dtos/meal_replace_dto.dart';
-import 'package:full_feed_app/models/entities/patient.dart';
-import 'package:full_feed_app/models/entities/user_session.dart';
-import 'package:full_feed_app/presenters/home_presenter.dart';
-import 'package:intl/intl.dart';
+import 'package:full_feed_app/model/entities/meal.dart';
+import 'package:full_feed_app/view_model/diet_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-import '../models/entities/meal.dart';
-import '../presenters/diet_calendar_presenter.dart';
-import '../presenters/diet_day_detail_presenter.dart';
-import '../utilities/connection_tags.dart';
+import '../view_model/diet_day_detail_view_model.dart';
 
 class DietProvider with ChangeNotifier {
 
-  final connectionTags = ConnectionTags();
-  late BasicDietCalendarPresenter dietPresenter;
-  late HomePresenter homePresenter;
-  late DietDayDetailPresenter dayDetailPresenter;
   bool firstDayEntry = true;
+  late DietDayDetailViewModel _dayDetailViewModel;
+
+  bool _isAlternativeMealSelected = false;
+  int _foodSelectedIndex = 0;
+
+  getAlternativeMealSelected(){
+    return _isAlternativeMealSelected;
+  }
 
   homePresenterChange(){
     notifyListeners();
   }
 
   setMealsReady(bool _mealsReady){
-    homePresenter.mealsReady = _mealsReady;
+    //homePresenter.mealsReady = _mealsReady;
     notifyListeners();
   }
 
-  initDietPresenter(BuildContext context, Patient? patient){
-    dietPresenter = BasicDietCalendarPresenter(context, patient);
+  bool getIsAlternativeMealSelected(){
+    return _isAlternativeMealSelected;
   }
 
-  initHomePresenter(BuildContext context){
-    homePresenter = HomePresenter(context);
+  int getFoodSelectedIndex(){
+    return _foodSelectedIndex;
   }
 
-  setDayDetailPresenter(int index){
-    dayDetailPresenter = dietPresenter.dayDetailPresenters[index];
+  setDayDetailPresenter(int index, BuildContext context){
+    _dayDetailViewModel = Provider.of<DietViewModel>(context, listen: false).getDietDayViewModels()[index];
   }
 
-  setMealSelected(Meal selected){
-    dayDetailPresenter.mealSelected = selected;
-    dayDetailPresenter.generateData();
-    dayDetailPresenter.splitIngredients(false);
-    getAlternativeMeals(selected);
+  setAlternativeMeal(int index){
+    _dayDetailViewModel.setAlternativeMeal(index);
+    _isAlternativeMealSelected = true;
     notifyListeners();
   }
 
-  setAlternativeMeal(Meal alternativeMeal, bool _changeFood){
-    dayDetailPresenter.changeFood = _changeFood;
-    dayDetailPresenter.alternativeMeal = alternativeMeal;
-    dayDetailPresenter.splitIngredients(_changeFood);
-    dayDetailPresenter.generateData();
+  deselectAlternativeMeal(){
+    _isAlternativeMealSelected = false;
     notifyListeners();
   }
 
-
-  Future<bool> getWeekDietMeals() async{
-
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.weekMealList;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.get(api, queryParameters: {'endDate' : dateFormat.format(dietPresenter.last), 'patientId' : UserSession().profileId, 'startDate': dateFormat.format(dietPresenter.initial)});
-    if(response.statusCode == 200){
-      List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      dietPresenter.initWeekMealList(aux.cast<Meal>());
-      return true;
-    }
-    return false;
+  DietDayDetailViewModel getDietDayDetailViewModel(){
+    return _dayDetailViewModel;
   }
 
-  Future<bool> getWeekDietMealsByPatient(int patientId) async{
-
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.weekMealList;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.get(api, queryParameters: {'endDate' : dateFormat.format(dietPresenter.last), 'patientId' : patientId, 'startDate': dateFormat.format(dietPresenter.initial)});
-    if(response.statusCode == 200){
-      List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      dietPresenter.initWeekMealList(aux.cast<Meal>());
-      return true;
-    }
-    return false;
-  }
-
-
-  Future<bool> getDayMeals() async{
-    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.dayMealList;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.get(api, queryParameters: {'date' : today, 'patientId' : UserSession().profileId});
-    if(response.statusCode == 200){
-      List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      homePresenter.dayMealList = aux.cast<Meal>();
-      return true;
-    }
-    return false;
-  }
-
-  Future<List<Meal>> getDayMealsByPatient(int patientId) async{
-    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.dayMealList;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.get(api, queryParameters: {'date' : today, 'patientId' : patientId});
-    if(response.statusCode == 200){
-      List aux = response.data.map((e) => Meal.fromJson(e)).toList();
-      return aux.cast<Meal>();
-    }
-    return [];
-  }
-
-  getAlternativeMeals(Meal meal) async{
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.alternativeMeals;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.post(api, data: {'calories': meal.totalCalories, 'schedule': meal.schedule});
-    if(response.statusCode == 200){
-      List aux = response.data["data"].map((e) => Meal.fromJson(e)).toList();
-      dayDetailPresenter.alternativeMealList = aux.cast<Meal>();
-    }
+  setMealSelected(Meal meal){
+    _dayDetailViewModel.setMealSelected(meal);
     notifyListeners();
   }
 
-  Future<bool> generateNutritionPlan(int patientId, int doctorId, BuildContext context) async {
-    final api = connectionTags.baseUrl + connectionTags.patientEndpoint + connectionTags.newNutritionalPlan;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.post(api, queryParameters: {'patientId' : patientId, 'doctorId' : doctorId});
-    if(response.statusCode == 201){
-      List aux = response.data['data'].map((e) => Meal.fromJson(e)).toList();
-      Provider.of<DietProvider>(context, listen: false).dietPresenter.weekMealList = aux.cast<Meal>();
-      Provider.of<DietProvider>(context, listen: false).dietPresenter.initDaysAtRegister(response.data['data'][0]['day']);
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> completeMeal(int mealId) async {
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.completeMeal;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.put(api, queryParameters: {'mealId' : mealId});
-    if(response.statusCode == 200){
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> restoreMeal(int mealId) async {
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.restoreMeal;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.put(api, queryParameters: {'mealId' : mealId});
-    if(response.statusCode == 200){
-      return false;
-    }
-    return true;
-  }
-
-  Future<Meal> replaceMeal(MealReplaceDto meal) async {
-    final api = connectionTags.baseUrl + connectionTags.mealEndpoint + connectionTags.replaceMeal;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-    Response response;
-    response = await dio.put(api, data: jsonEncode(meal));
-    if(response.statusCode == 200){
-      Meal aux = Meal.fromJson(response.data["data"]);
-      return aux;
-    }
-    return Meal();
-  }
-
-  Future<bool> updatePatient(int patientId, double height, double weight, double imc) async {
-    final api = connectionTags.baseUrl + connectionTags.patientEndpoint + connectionTags.updatePatient;
-    final dio = Dio();
-    dio.options.headers["authorization"] = "Bearer ${UserSession().token}";
-
-    var patientUpdateDTO = {
-      "abdominal": 0,
-      "arm": 0,
-      "height": height,
-      "imc": imc,
-      "patientId": patientId,
-      "tmb": 0,
-      "weight": weight
-    };
-
-    Response response;
-    response = await dio.put(api, data: patientUpdateDTO);
-    if(response.statusCode == 200){
-      homePresenter.setPatientAfterUpdate(Patient.fromJson(response.data['data']));
-      return true;
-    }
-    return false;
-  }
+  // setAlternativeMeal(Meal alternativeMeal, bool _changeFood){
+  //   dayDetailPresenter.changeFood = _changeFood;
+  //   dayDetailPresenter.alternativeMeal = alternativeMeal;
+  //   dayDetailPresenter.splitIngredients(_changeFood);
+  //   dayDetailPresenter.generateData();
+  //   notifyListeners();
+  // }
 
 }
